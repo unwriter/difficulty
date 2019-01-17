@@ -1,0 +1,42 @@
+<html>
+<head>
+<style>
+body { margin: 0; }
+#chart { width: 100%; height: 100%; }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function(e) {
+  var query = {
+    "v": 3,
+    "q": {
+      "find": { "height": { "$gte": 556000 } },
+      "limit": 10000,
+      "project": { "difficulty": 1, "height": 1 }
+    }
+  }
+  var endpoint = "https://meta.bitdb.network/q/18uQBWMhHgiieR6FnQtXDDba8T97LVu5uH/"
+  var encoded = btoa(JSON.stringify(query))
+  var url = endpoint + encoded
+  var header = { headers: { key: "173cVHXFHJ8GH2VwYZFgPGG1BpTsvfQVt8" } }
+  fetch(url, header)
+    .then(function(r) {
+      return r.json()
+    })
+    .then(function(r) {
+      var ctx = document.getElementById("chart").getContext('2d');
+      var diff = r.block.map(function(b) { return b.difficulty }).reverse()
+      var heights = r.block.map(function(b) { return b.height }).reverse()
+      var chart = new Chart(ctx, {
+        type: 'line',
+        data: { labels: heights, datasets: [{label: 'bitcoin difficulty', data: diff }] },
+        options: { animation: false }
+      })
+    })
+})
+</script>
+</head>
+<body>
+<canvas id="chart"></canvas>
+</body>
+</html>
